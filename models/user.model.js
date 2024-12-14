@@ -6,7 +6,7 @@ const userSchema = new Schema(
     username: {
       type: String,
       unique: true,
-      required: true,
+      required: false,
     },
     email: {
       type: String,
@@ -20,8 +20,13 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
-      required: [true, "Password is required!"],
-    }
+      //required: [true, "Password is required!"],
+      required: false
+    },
+    googleId: {
+       type: String,
+        required: false
+    },
   },
 
   { timestamps: true }
