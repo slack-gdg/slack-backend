@@ -6,10 +6,11 @@ const channelSchema = new Schema(
       type: String,
       required: true,
     },
-    members: {
-      type: Array,
-    },
-    desc: {
+    members: [{
+      type: Schema.Types.ObjectId,
+      ref: "Members",
+    }],
+    description: {
       type: String,
       required: true,
     },
@@ -19,6 +20,7 @@ const channelSchema = new Schema(
     owner: {
       type: Schema.Types.ObjectId,
       ref: "User",
+      required:true,
     },
   },
   { timestamps: true }

@@ -13,7 +13,6 @@ export const validateUser=asyncHandler(async(req, res, next)=>{
 
 export const verifyJWT=asyncHandler(async(req,res,next)=>{
     try {      
-      // console.log(req);
       
         const token=req.cookies?.accessToken
         if(!token){
