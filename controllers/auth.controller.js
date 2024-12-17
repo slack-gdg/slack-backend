@@ -49,8 +49,8 @@ const registerUser = asyncHandler(async (req, res, next) => {
 const loginUser = asyncHandler(async (req, res, next) => {
 
     const { email, username, password } = req.body
-    if (!username && !email) {
-        res.status(500).json({message:"username or email is required"})
+    if (!username && !email && !password) {
+        res.status(500).json({message:"All fields are required"})
     }
     const user = await User.findOne({
         $or: [{ username }, { email }]
@@ -63,7 +63,6 @@ const loginUser = asyncHandler(async (req, res, next) => {
         res.status(401).json({message:"Invalid user credentials"})
     }
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
-    const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
     const options = {
         httpOnly: true,
         secure: true
@@ -78,7 +77,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
 }
         )
 const logoutUser = asyncHandler(async (req, res, next) => {
-    await User.findByIdAndUpdate(
+   const user= await User.findByIdAndUpdate(
         req.user._id,
         {
             $unset: {

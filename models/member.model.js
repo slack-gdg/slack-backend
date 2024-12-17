@@ -2,12 +2,10 @@ import mongoose, { Schema } from "mongoose";
 
 const memberSchema = new Schema(
   {
-    memberId: {
-      type: String,
-    },
-    channelId: {
-      type: Array,
-    },
+    channelId: [{
+      type: Schema.Types.ObjectId,
+      ref:"Channel",
+    }],
     userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
