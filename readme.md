@@ -1,5 +1,5 @@
 # Slack Chat App
-A robust chat application with real-time messaging and OAuth authentication exclusively for GDG onCampus JSSATEN members.
+Slack is a collaborative communication platform designed to streamline team interactions and improve productivity. It offers real-time messaging, channels for team discussions, direct messaging, file sharing, and integrations with other tools. Our goal is to provide a simple yet powerful solution for seamless communication in workplaces, helping teams stay connected and organized.Designed exclusively for GDG onCampus JSSATEN members.
 
 ## Doc:
 [﻿Google Doc](https://docs.google.com/document/d/1Q1VXvBD0HFrGAOq7WAvrP14VP6y-OwvE3YZRTPQBpf4/edit?usp=sharing) of the features and functionalities needed for the backend.

@@ -50,17 +50,17 @@ const loginUser = asyncHandler(async (req, res, next) => {
 
     const { email, username, password } = req.body
     if (!username && !email && !password) {
-        res.status(500).json({message:"All fields are required"})
+       return res.status(500).json({message:"All fields are required"})
     }
     const user = await User.findOne({
         $or: [{ username }, { email }]
     })
     if (!user) {
-        res.status(404).json({message:"User does not exist"})
+       return res.status(404).json({message:"User does not exist"})
     }
     const isPasswordValid = await user.isPasswordCorrect(password)
     if (!isPasswordValid) {
-        res.status(401).json({message:"Invalid user credentials"})
+       return res.status(401).json({message:"Invalid user credentials"})
     }
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
     const options = {
@@ -101,6 +101,8 @@ const logoutUser = asyncHandler(async (req, res, next) => {
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
+    console.log(req);
+    
     if (!incomingRefreshToken) {
         res.status(401).json({message:"unauthorized request"})
     }
