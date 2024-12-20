@@ -1,16 +1,29 @@
 import { Channel } from "../models/channel.model.js"
 import { Members } from "../models/member.model.js"
-import { User } from "../models/user.model.js"
 import logger from "../utils/logger.js"
+import axios from "axios";
+import dotenv from "dotenv";
+dotenv.config();
 
+
+//To create a Channel and save the details about the channel with an avatar and create a member i.e. owner as soon as the channel is created & send response.
 const createChannel = async (req, res, next) => {
     try {
         const { name, description, userId } = req.body
+        const response = await axios.get('https://api.unsplash.com/photos/random', {
+            headers: {
+                Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}`,
+            },
+            params: {
+                count: 1,
+            },
+        });        
+        const randomImage = response.url;
         const newChannel = new Channel({
             name,
             members: [],
             description,
-            avatar: '',
+            avatar: randomImage,
             owner: userId
         })
         const saveChannel = await newChannel.save()
@@ -25,12 +38,15 @@ const createChannel = async (req, res, next) => {
             message: 'Channel created successfully',
             channel: saveChannel,
             member: OwnerMember,
+            data: response.data,
         });
     } catch (error) {
         logger.error(error.message);
         return res.status(500).json({ message: 'Error creating channel' });
     }
 }
+
+//To find all the Channels and populate the response with info about its members and owner and return it
 const getAllChannels = async (req, res, next) => {
     try {
         const channels = await Channel.find().populate('members').populate('owner');
@@ -44,6 +60,7 @@ const getAllChannels = async (req, res, next) => {
     }
 };
 
+//To find the Channel using its unique ID and populate the response with the owner and members data and return the channel
 const getChannelUsingId = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -57,59 +74,7 @@ const getChannelUsingId = async (req, res, next) => {
         return res.status(500).json({ message: "Error fetching channel", error });
     }
 };
-const addMemberToChannel = async (req, res, next) => {
-    try {
-        const { channelId } = req.params;
-        const { userId } = req.body;
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        const channel = await Channel.findById(channelId);
-        if (!channel) {
-            return res.status(404).json({ message: "Channel not found" });
-        }
-        const newMember = new Members({
-            userId: userId,
-            channelId: channelId
-        });
-        await newMember.save();
-        channel.members.push(newMember._id);
-        await channel.save();
-        return res.status(201).json({ message: "User has joined the channel", member: newMember });
-    } catch (error) {
-        logger.error(error.message);
-        return res.status(500).json({ message: "Error adding member", error });
-    }
-};
-const getChannelMembers = async (req, res, next) => {
-    const { userId } = req.params;
-    try {
-        const members = await Members.find({ userId }).populate('channelId');
-
-        if (!members || members.length === 0) {
-            return res.status(404).json({ message: 'This user is not part of any Channel' });
-        }
-        const response = await Promise.all(members.map(async (member) => {
-            const channel = await Channel.findById(member.channelId).populate('owner');
-            const user = await User.findById(member.userId);
-            return {
-                channel: channel,
-                user: user,
-            };
-        }));
-
-        return res
-            .status(200)
-            .json({
-                message: 'Channel members fetched successfully',
-                data: response,
-            });
-    } catch (error) {
-        logger.error(error.message)
-        return res.status(500).json({ message: 'Error fetching channel members' });
-    }
-}
+ // To update the channel info based on its unique id with the provided payload and return the update channel object.
 const updateChannel = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -131,6 +96,8 @@ const updateChannel = async (req, res, next) => {
         return res.status(500).json({ message: "Error updating the channel", error });
     }
 };
+
+//To delete the Channel based on its unique id and return the response if channel is deleted successfully.
 const deleteChannel = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -145,22 +112,6 @@ const deleteChannel = async (req, res, next) => {
         return res.status(500).json({ message: "Error while deleting channel", error });
     }
 };
-const deleteMemberFromChannel = async (req, res, next) => {
-    try {
-        const { channelId, memberId } = req.params;
-        const member = await Members.findOneAndDelete({ channelId, userId: memberId });
-        if (!member) {
-            return res.status(404).json({ message: "Member not found" });
-        }
-        const channel = await Channel.findById(channelId);
-        channel.members.pull(member._id);
-        await channel.save();
-        return res.status(200).json({ message: "Member has been removed from the channel" });
-    } catch (error) {
-        logger.error(error.message);
-        return res.status(500).json({ message: "Error removing member", error });
-    }
-};
 
 
-export { createChannel, getChannelMembers, getAllChannels, getChannelUsingId, addMemberToChannel, updateChannel, deleteChannel, deleteMemberFromChannel }
+export { createChannel, getAllChannels, getChannelUsingId, updateChannel, deleteChannel}

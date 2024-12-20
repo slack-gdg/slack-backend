@@ -4,7 +4,7 @@ import passport from "passport";
 import session from "express-session"
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { oauthRoutes, userRoutes, channelRoutes } from "./routes/index.js"
+import { oauthRoutes, userRoutes, channelRoutes, memberRoutes } from "./routes/index.js"
 import logger from "./utils/logger.js"
 
 const app = express();
@@ -34,6 +34,7 @@ app.use(cookieParser())
 app.use("/", oauthRoutes);
 app.use("/users", userRoutes);
 app.use("/channel", channelRoutes);
+app.use("/channel",memberRoutes)
 
 app.use((req, res, next) => {
     logger.info(`${req.method} ${req.url}`);
