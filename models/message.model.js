@@ -5,15 +5,15 @@ const messageSchema = new mongoose.Schema(
     content: {
       type: String,
     },
-    attachment: {
-      type: String,
-    },
-    memberId: [
+    attachment: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        type: String,
       },
     ],
+    memberId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Member",
+    },
   },
   { timestamps: true }
 );

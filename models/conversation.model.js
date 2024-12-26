@@ -16,15 +16,13 @@ const conversationSchema = new mongoose.Schema(
     memberId: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "Member",
       },
     ],
-    channelId: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Channel",
-      },
-    ],
+    channelId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Channel",
+    },
   },
   { timestamps: true }
 );
