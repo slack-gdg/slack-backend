@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import logger from "../utils/logger.js";
 import { User } from "../models/user.model.js";
+import axios from "axios";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -33,9 +34,21 @@ const registerUser = asyncHandler(async (req, res, next) => {
       .status(409)
       .json({ message: "User with email or username already exists" });
   }
+
+  const response = await axios.get("https://api.unsplash.com/photos/random", {
+    headers: {
+      Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}`,
+    },
+    params: {
+      count: 1,
+    },
+  });
+  const randomImage = response.url;
+
   const user = await User.create({
     fullName,
     email,
+    avatar: randomImage,
     password,
     username: username.toLowerCase(),
   });

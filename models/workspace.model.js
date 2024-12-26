@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const channelSchema = new Schema(
+const workspaceSchema = new Schema(
   {
     name: {
       type: String,
@@ -12,18 +12,26 @@ const channelSchema = new Schema(
         ref: "Members",
       },
     ],
+    description: {
+      type: String,
+      required: true,
+    },
+    avatar: {
+      type: String,
+    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    workspaceId: {
-      type: Schema.Types.ObjectId,
-      ref: "Workspace",
-      required: true,
-    },
+    channels: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Channel",
+      },
+    ],
   },
   { timestamps: true }
 );
 
-export const Channel = mongoose.model("Channel", channelSchema);
+export const Workspace = mongoose.model("Workspace", workspaceSchema);

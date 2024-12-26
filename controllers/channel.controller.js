@@ -1,7 +1,7 @@
 import { Channel } from "../models/channel.model.js"
 import { Members } from "../models/member.model.js"
+import { Workspace } from "../models/workspace.model.js"
 import logger from "../utils/logger.js"
-import axios from "axios";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -9,27 +9,19 @@ dotenv.config();
 //To create a Channel and save the details about the channel with an avatar and create a member i.e. owner as soon as the channel is created & send response.
 const createChannel = async (req, res, next) => {
     try {
-        const { name, description, userId } = req.body
-        const response = await axios.get('https://api.unsplash.com/photos/random', {
-            headers: {
-                Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}`,
-            },
-            params: {
-                count: 1,
-            },
-        });        
-        const randomImage = response.url;
+        const { workspaceId } = req.params
+        const { name, userId } = req.body
         const newChannel = new Channel({
             name,
             members: [],
-            description,
-            avatar: randomImage,
+            workspaceId: workspaceId,
             owner: userId
         })
         const saveChannel = await newChannel.save()
         const OwnerMember = new Members({
             userId: userId,
-            channelId: saveChannel._id
+            channelId: saveChannel._id,
+            workspaceId: workspaceId,
         })
         await OwnerMember.save();
         saveChannel.members.push(OwnerMember._id);
@@ -78,16 +70,13 @@ const getChannelUsingId = async (req, res, next) => {
 const updateChannel = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { name, description } = req.body;
+        const { name } = req.body;
         const channel = await Channel.findById(id);
         if (!channel) {
             return res.status(404).json({ message: "Channel not found" });
         }
         if (name) {
             channel.name = name;
-        }
-        if (description) {
-            channel.description = description;
         }
         await channel.save();
         return res.status(200).json({ message: "Channel updation successful", channel });
@@ -106,6 +95,19 @@ const deleteChannel = async (req, res, next) => {
             return res.status(404).json({ message: "Channel was not found" });
         }
         await Members.deleteMany({ channelId: id });
+
+        const {workspaceId} = channel;
+        
+        const workspace = await Workspace.findById(workspaceId);
+
+        if (!workspace) {
+            return res.status(404).json({ message: "Workspace not found" });
+        }
+
+        workspace.channels.pull(channel._id);
+
+        await workspace.save();
+
         return res.status(200).json({ message: "Channel deleted successfully" });
     } catch (error) {
         logger.error(error.message);
