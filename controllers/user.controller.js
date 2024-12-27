@@ -3,7 +3,6 @@ import logger from "../utils/logger.js";
 import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import { Members } from "../models/member.model.js";
-import { Channel } from "../models/channel.model.js";
 
 //~ Get all users
 const getAllUsers = async (req, res) => {

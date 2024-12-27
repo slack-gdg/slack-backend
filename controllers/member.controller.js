@@ -1,50 +1,51 @@
+import { Workspace } from "../models/workspace.model.js"
 import { Channel } from "../models/channel.model.js"
 import { Members } from "../models/member.model.js"
 import { User } from "../models/user.model.js"
 import logger from "../utils/logger.js"
-import mongoose from "mongoose"
 
-//To add member to a channel and push the new member's id in the members array of Channel schema and save the channel.
-const addMemberToChannel = async (req, res, next) => {
+//To add member to a workspace and push the new member's id in the members array of Workspace schema and save the workspace.
+const addMemberToWorkspace = async (req, res, next) => {
     try {
-        const { channelId } = req.params;
+        const { workspaceId } = req.params;
         const { userId } = req.body;
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        const channel = await Channel.findById(channelId);
-        if (!channel) {
-            return res.status(404).json({ message: "Channel not found" });
+        const workspace = await Workspace.findById(workspaceId);
+        if (!workspace) {
+            return res.status(404).json({ message: "Workspace not found" });
         }
         const newMember = new Members({
             userId: userId,
-            channelId: channelId
+            channelId: [],
+            workspaceId: workspaceId
         });
         await newMember.save();
-        channel.members.push(newMember._id);
-        await channel.save();
-        return res.status(201).json({ message: "User has joined the channel", member: newMember });
+        workspace.members.push(newMember._id);
+        await workspace.save();
+        return res.status(201).json({ message: "User has joined the workspace", member: newMember });
     } catch (error) {
         logger.error(error.message);
         return res.status(500).json({ message: "Error adding member", error });
     }
 };
 
-//To find and return the complete channel and user object about all the channels a user is part of.
-const getChannelMembers = async (req, res, next) => {
+//To find and return the complete workspace and user object about all the workspaces a user is part of.
+const getWorkspaceMembers = async (req, res, next) => {
     const { userId } = req.params;
     try {
-        const members = await Members.find({ userId }).populate('channelId');
+        const members = await Members.find({ userId }).populate('workspaceId');
 
         if (!members || members.length === 0) {
-            return res.status(404).json({ message: 'This user is not part of any Channel' });
+            return res.status(404).json({ message: 'This user is not part of any Workspace' });
         }
         const response = await Promise.all(members.map(async (member) => {
-            const channel = await Channel.findById(member.channelId).populate('owner');
+            const workspace = await Workspace.findById(member.workspaceId).populate('owner');
             const user = await User.findById(member.userId);
             return {
-                channel: channel,
+                workspace: workspace,
                 user: user,
             };
         }));
@@ -52,35 +53,43 @@ const getChannelMembers = async (req, res, next) => {
         return res
             .status(200)
             .json({
-                message: 'Channel members fetched successfully',
+                message: 'Workspace members fetched successfully',
                 data: response,
             });
     } catch (error) {
         logger.error(error.message)
-        return res.status(500).json({ message: 'Error fetching channel members' });
+        return res.status(500).json({ message: 'Error fetching workspace members' });
     }
 };
 
-//To delete a member from a channel using both their respective unique IDs and return the response
-const deleteMemberFromChannel = async (req, res, next) => {
+//To delete a member from a workspace using both their respective unique IDs and return the response
+const deleteMemberFromWorkspace = async (req, res, next) => {
     try {
-        const { channelId, memberId } = req.params;
+        const { workspaceId, memberId } = req.params;
         const member = await Members.findById(memberId);
         if (!member) {
             return res.status(404).json({ message: "Member not found" });
         }
         const { userId } = member; 
-    await Members.findOneAndDelete({ channelId, userId});
-        const channel = await Channel.findById(channelId);
-        if (!channel) {
-            return res.status(404).json({ message: "Channel not found" });
+        await Members.findOneAndDelete({ workspaceId, userId});
+        const workspace = await Workspace.findById(workspaceId);
+        if (!workspace) {
+            return res.status(404).json({ message: "Workspace not found" });
         }
-        channel.members.pull(member._id);
-        await channel.save();
-        return res.status(200).json({ message: "Member has been removed from the channel" });
+        workspace.members.pull(member._id);
+        await workspace.save();
+
+        const channels = await Channel.find({ workspaceId });
+
+        for (const channel of channels) {
+            channel.members.pull(member._id);
+            await channel.save();
+        }
+
+        return res.status(200).json({ message: "Member has been removed from the workspace" });
     } catch (error) {
         logger.error(error.message);
         return res.status(500).json({ message: "Error removing member", error });
     }
 };
-export {addMemberToChannel,getChannelMembers,deleteMemberFromChannel}
+export {addMemberToWorkspace,getWorkspaceMembers,deleteMemberFromWorkspace}
