@@ -103,6 +103,11 @@ const updateWorkspace = async (req, res, next) => {
             return res.status(400).json({ message: "Workspace ID is required" });
         }
 
+        if(!name || !description){
+            return res.status(400).json({message:"Name and description are required"})
+        }
+            
+
         const workspace = await Workspace.findById(id);
 
         if (!workspace) {

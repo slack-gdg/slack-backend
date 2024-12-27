@@ -7,6 +7,7 @@ import { Members } from "../models/member.model.js";
 //~ Get all users
 const getAllUsers = async (req, res) => {
   try {
+
     const users = await User.find().select("-password -refreshToken");
 
     if (!users || users.length === 0) {
@@ -51,6 +52,9 @@ const updateUser = asyncHandler(async (req, res) => {
   if (!id || id.trim() === "") {
     return res.status(400).json({ msg: "ID is required!" });
   }
+  
+  if(!username || !email || !fullName || !password)
+    return res.status(400).json({msg:"All fields are required"})
 
   try {
     const user = await User.findById(id);

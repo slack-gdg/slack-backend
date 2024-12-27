@@ -9,22 +9,33 @@ const addMemberToWorkspace = async (req, res, next) => {
     try {
         const { workspaceId } = req.params;
         const { userId } = req.body;
+
+        if(!workspaceId)
+            return res.status(404).json({message:"Workspace Id is required"});
+
+        if(!userId)
+            return res.status(404).json({message:"User Id is required"});
+
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
+
         const workspace = await Workspace.findById(workspaceId);
         if (!workspace) {
             return res.status(404).json({ message: "Workspace not found" });
         }
+
         const newMember = new Members({
             userId: userId,
             channelId: [],
             workspaceId: workspaceId
         });
         await newMember.save();
+
         workspace.members.push(newMember._id);
         await workspace.save();
+
         return res.status(201).json({ message: "User has joined the workspace", member: newMember });
     } catch (error) {
         logger.error(error.message);
@@ -35,15 +46,23 @@ const addMemberToWorkspace = async (req, res, next) => {
 //To find and return the complete workspace and user object about all the workspaces a user is part of.
 const getWorkspaceMembers = async (req, res, next) => {
     const { userId } = req.params;
+
+    if(!userId)
+        return res.status(404).json({message:"User Id is required"});
     try {
+
         const members = await Members.find({ userId }).populate('workspaceId');
 
         if (!members || members.length === 0) {
             return res.status(404).json({ message: 'This user is not part of any Workspace' });
         }
+
         const response = await Promise.all(members.map(async (member) => {
+
             const workspace = await Workspace.findById(member.workspaceId).populate('owner');
+
             const user = await User.findById(member.userId);
+
             return {
                 workspace: workspace,
                 user: user,
@@ -66,16 +85,23 @@ const getWorkspaceMembers = async (req, res, next) => {
 const deleteMemberFromWorkspace = async (req, res, next) => {
     try {
         const { workspaceId, memberId } = req.params;
+
+        if(!workspaceId || !memberId)
+            return res.status(404).jsom({message:"Both workspace Id and User Id are required"})
+
         const member = await Members.findById(memberId);
         if (!member) {
             return res.status(404).json({ message: "Member not found" });
         }
+
         const { userId } = member; 
         await Members.findOneAndDelete({ workspaceId, userId});
+        
         const workspace = await Workspace.findById(workspaceId);
         if (!workspace) {
             return res.status(404).json({ message: "Workspace not found" });
         }
+
         workspace.members.pull(member._id);
         await workspace.save();
 
