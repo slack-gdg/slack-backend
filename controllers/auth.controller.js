@@ -7,9 +7,11 @@ import axios from "axios";
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
     const user = await User.findById(userId);
+
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
     user.refreshToken = refreshToken;
+
     await user.save({ validateBeforeSave: false });
     return { accessToken, refreshToken };
   } catch (error) {
@@ -21,11 +23,13 @@ const generateAccessAndRefreshTokens = async (userId) => {
 };
 const registerUser = asyncHandler(async (req, res, next) => {
   const { fullName, email, username, password } = req.body;
+
   if (
     [fullName, email, username, password].some((field) => field?.trim() === "")
   ) {
     return res.status(400).json({ message: "All Fields are required" });
   }
+
   const existedUser = await User.findOne({
     $or: [{ username }, { email }],
   });
@@ -52,6 +56,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
     password,
     username: username.toLowerCase(),
   });
+
   const createdUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
@@ -66,22 +71,27 @@ const registerUser = asyncHandler(async (req, res, next) => {
 
 const loginUser = asyncHandler(async (req, res, next) => {
   const { email, username, password } = req.body;
+
   if (!username && !email && !password) {
     return res.status(400).json({ message: "All fields are required" });
   }
+
   const user = await User.findOne({
     $or: [{ username }, { email }],
   });
   if (!user) {
     return res.status(404).json({ message: "User does not exist" });
   }
+
   const isPasswordValid = await user.isPasswordCorrect(password);
   if (!isPasswordValid) {
     return res.status(401).json({ message: "Invalid user credentials" });
   }
+
   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
     user._id
   );
+
   const options = {
     httpOnly: true,
     secure: true,
@@ -93,6 +103,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
     .json({ message: "User logged in successfully" });
 });
 const logoutUser = asyncHandler(async (req, res, next) => {
+
   const user = await User.findByIdAndUpdate(
     req.user._id,
     {
@@ -104,6 +115,7 @@ const logoutUser = asyncHandler(async (req, res, next) => {
       new: true,
     }
   );
+
   const options = {
     httpOnly: true,
     secure: true,
@@ -116,11 +128,13 @@ const logoutUser = asyncHandler(async (req, res, next) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
+
   const incomingRefreshToken =
     req.cookies.refreshToken || req.body.refreshToken;
   if (!incomingRefreshToken) {
     return res.status(401).json({ message: "unauthorized request" });
   }
+
   try {
     const decodedToken = jwt.verify(
       incomingRefreshToken,
@@ -131,6 +145,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "Invalid refresh token" });
     }
+
     if (incomingRefreshToken !== user?.refreshToken) {
       return res
         .status(401)
@@ -141,8 +156,10 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       httpOnly: true,
       secure: true,
     };
+
     const { accessToken, newRefreshToken } =
       await generateAccessAndRefreshTokens(user._id);
+      
     return res
       .status(200)
       .cookie("accessToken", accessToken, options)
