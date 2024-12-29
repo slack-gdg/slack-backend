@@ -17,6 +17,12 @@ const createConversation = async (req, res) => {
         .json({ error: "Channel ID is required for Channel conversations." });
     }
 
+    if (conversationType === "DM" && !memberId) {
+      return res
+        .status(400)
+        .json({ error: "Member ID is required for DM conversations." });
+    }
+
     const conversation = new Conversation({
       conversationType,
       memberId,
@@ -45,7 +51,7 @@ const getConversationById = async (req, res) => {
       .populate("memberId", "name")
       .populate("channelId", "name");
 
-    if (!conversation.length) {
+    if (!conversation) {
       return res.status(404).json({ error: "Conversation not found." });
     }
 
@@ -58,7 +64,7 @@ const getConversationById = async (req, res) => {
 };
 
 // Get all conversations for a user
-const getConversationsByMember = async (req, res) => {
+const getConversationsByMemberId = async (req, res) => {
   try {
     const { memberId } = req.params;
 
@@ -97,7 +103,7 @@ const getConversationByChannelId = async (req, res) => {
     if (!conversation.length) {
       return res.status(404).json({ error: "No conversations found." });
     }
-    
+
     res.status(200).json(conversation);
   } catch (err) {
     res
@@ -109,6 +115,6 @@ const getConversationByChannelId = async (req, res) => {
 export {
   createConversation,
   getConversationById,
-  getConversationsByMember,
+  getConversationsByMemberId,
   getConversationByChannelId,
 };
