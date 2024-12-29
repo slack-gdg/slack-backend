@@ -2,7 +2,7 @@ import express from "express";
 import {
   createConversation,
   getConversationById,
-  getConversationsByMember,
+  getConversationsByMemberId,
   getConversationByChannelId,
 } from "../controllers/conversation.controller.js";
 
@@ -12,7 +12,7 @@ router.post("/", createConversation);
 
 router.get("/:conversationId", getConversationById);
 
-router.get("/member/:memberId", getConversationsByMember);
+router.get("/member/:memberId", getConversationsByMemberId);
 
 router.get("/channel/:channelId", getConversationByChannelId);
 
