@@ -1,7 +1,16 @@
 import { Router } from "express";
-import { getChannelMembers ,addMemberToChannel,deleteMemberFromChannel} from "../controllers/member.controller.js";
-const router=Router()
-router.route("/get-Channel-Members/:userId").get(getChannelMembers)
-router.route("/:channelId/members").post(addMemberToChannel)
-router.route("/:channelId/members/:memberId").delete(deleteMemberFromChannel)
-export default router
+import {
+  getWorkspacesByMemberId,
+  addMemberToWorkspace,
+  deleteMemberFromWorkspace,
+  getConversationsByParticipant,
+} from "../controllers/member.controller.js";
+
+const router = Router();
+
+router.route("/all/member/:userId").get(getWorkspacesByMemberId);
+router.route("/member/add/:workspaceId").post(addMemberToWorkspace);
+router.route("/member/delete/:workspaceId/:memberId").delete(deleteMemberFromWorkspace);
+router.route("/member/conversations/:memberId/").get(getConversationsByParticipant);
+
+export default router;

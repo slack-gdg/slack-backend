@@ -7,7 +7,7 @@ import cors from "cors";
 import {
   oauthRoutes,
   userRoutes,
-  channelRoutes,
+  // channelRoutes,
   memberRoutes,
   conversationRoutes,
 } from "./routes/index.js";
@@ -40,8 +40,8 @@ app.use(cookieParser());
 
 app.use("/", oauthRoutes);
 app.use("/users", userRoutes);
-app.use("/channel", channelRoutes);
-app.use("/channel", memberRoutes);
+// app.use("/channel", channelRoutes);
+app.use("/workspace", memberRoutes);
 app.use("/conversation", conversationRoutes);
 
 app.use((req, res, next) => {
