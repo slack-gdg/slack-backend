@@ -8,9 +8,9 @@ import {
 
 const router = Router();
 
-router.route("/all/member/:userId").get(getWorkspacesByMemberId);
-router.route("/member/add/:workspaceId").post(addMemberToWorkspace);
-router.route("/member/delete/:workspaceId/:memberId").delete(deleteMemberFromWorkspace);
-router.route("/member/conversations/:memberId/").get(getConversationsByParticipant);
+router.route("/all/:userId").get(getWorkspacesByMemberId);
+router.route("/add/:workspaceId").post(addMemberToWorkspace);
+router.route("/delete/:workspaceId/:memberId").delete(deleteMemberFromWorkspace);
+router.route("/conversations/:memberId/").get(getConversationsByParticipant);
 
 export default router;

@@ -82,7 +82,7 @@ const getConversationByChannelId = async (req, res) => {
 
     const conversation = await Conversation.find({ channelId: channelId });
 
-    if (!conversation.length) {
+    if (conversation.length === 0) {
       return res.status(404).json({ error: "No conversations found." });
     }
 
