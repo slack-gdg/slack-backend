@@ -2,6 +2,7 @@ import { Workspace } from "../models/workspace.model.js"
 import { Channel } from "../models/channel.model.js"
 import { Members } from "../models/member.model.js"
 import { User } from "../models/user.model.js"
+import { Conversation } from "../models/conversation.model.js";
 import logger from "../utils/logger.js"
 
 //To add member to a workspace and push the new member's id in the members array of Workspace schema and save the workspace.
@@ -44,7 +45,7 @@ const addMemberToWorkspace = async (req, res, next) => {
 };
 
 //To find and return the complete workspace and user object about all the workspaces a user is part of.
-const getWorkspaceMembers = async (req, res, next) => {
+const getWorkspacesByMemberId = async (req, res, next) => {
     const { userId } = req.params;
 
     if(!userId)
@@ -118,4 +119,28 @@ const deleteMemberFromWorkspace = async (req, res, next) => {
         return res.status(500).json({ message: "Error removing member", error });
     }
 };
-export {addMemberToWorkspace,getWorkspaceMembers,deleteMemberFromWorkspace}
+
+// Get all conversations for a user
+const getConversationsByParticipant = async (req, res) => {
+    try {
+      const { memberId } = req.params;
+  
+      if (!memberId) {
+        return res.status(400).json({ error: "Member ID is required." });
+      }
+  
+      const conversations = await Conversation.find({ participants: memberId })
+      
+      if (!conversations.length) {
+        return res.status(404).json({ error: "No conversations found." });
+      }
+  
+      res.status(200).json(conversations);
+    } catch (err) {
+      res
+        .status(500)
+        .json({ error: "Failed to fetch conversations.", details: err.message });
+    }
+  };
+
+export {addMemberToWorkspace,getWorkspacesByMemberId,deleteMemberFromWorkspace,getConversationsByParticipant}

@@ -3,10 +3,16 @@ import oauthRoutes from "./oauth.routes.js"
 import userRoutes from "./user.routes.js"
 import channelRoutes from "./channel.routes.js"
 import memberRoutes from "./member.routes.js"
+import conversationRoutes from "./conversation.routes.js"
+import workspaceRoutes from "./workspace.routes.js"
 
 const router=express.Router();
+
 router.use('/',oauthRoutes)
 router.use('/',userRoutes)
 router.use('/',channelRoutes)
 router.use('/',memberRoutes)
-export {oauthRoutes,userRoutes,channelRoutes,memberRoutes};
+router.use('/',conversationRoutes)
+router.use('/',workspaceRoutes)
+
+export {oauthRoutes,userRoutes,memberRoutes,conversationRoutes,workspaceRoutes,channelRoutes};
