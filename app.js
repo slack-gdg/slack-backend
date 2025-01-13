@@ -10,7 +10,8 @@ import {
   channelRoutes,
   memberRoutes,
   conversationRoutes,
-  workspaceRoutes
+  workspaceRoutes,
+  messageRoutes
 } from "./routes/index.js";
 import logger from "./utils/logger.js";
 
@@ -45,6 +46,7 @@ app.use("/channel", channelRoutes);
 app.use("/member", memberRoutes);
 app.use("/workspace", workspaceRoutes);
 app.use("/conversation", conversationRoutes);
+app.use("/messages",messageRoutes)
 
 app.use((req, res, next) => {
   logger.info(`${req.method} ${req.url}`);
