@@ -1,4 +1,5 @@
 import express from "express";
+import http from "http";
 import connectDB from "./database/index.js";
 import passport from "passport";
 import session from "express-session";
@@ -10,9 +11,10 @@ import {
   channelRoutes,
   memberRoutes,
   conversationRoutes,
-  workspaceRoutes
+  workspaceRoutes,
 } from "./routes/index.js";
 import logger from "./utils/logger.js";
+import { SocketServiceInit } from "./services/socket-server.js";
 
 const app = express();
 
@@ -53,4 +55,8 @@ app.use((req, res, next) => {
 
 connectDB();
 
-export default app;
+const server = http.createServer(app);
+
+SocketServiceInit(server);
+
+export default server;
