@@ -14,8 +14,12 @@ const messageSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Member",
     },
+    conversationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Conversation",
+    },
   },
   { timestamps: true }
 );
 
-const Message = mongoose.model("Message", messageSchema);
+export const Message = mongoose.model("Message", messageSchema);
