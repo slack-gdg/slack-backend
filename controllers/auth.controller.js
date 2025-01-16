@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import logger from "../utils/logger.js";
 import { User } from "../models/user.model.js";
 import axios from "axios";
+import bcrypt from "bcrypt"
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -49,11 +50,13 @@ const registerUser = asyncHandler(async (req, res, next) => {
   });
   const randomImage = response.url;
 
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   const user = await User.create({
     fullName,
     email,
     avatar: randomImage,
-    password,
+    password:hashedPassword,
     username: username.toLowerCase(),
   });
 
