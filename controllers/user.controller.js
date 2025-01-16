@@ -53,9 +53,6 @@ const updateUser = asyncHandler(async (req, res) => {
     return res.status(400).json({ msg: "ID is required!" });
   }
   
-  if(!username || !email || !fullName || !password)
-    return res.status(400).json({msg:"All fields are required"})
-
   try {
     const user = await User.findById(id);
 
