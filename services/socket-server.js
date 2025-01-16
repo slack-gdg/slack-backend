@@ -10,7 +10,9 @@ export const SocketServiceInit = (server) => {
     console.log("New Connection connected :", socket.id);
 
     // event for joining conversation
-    socket.on("join-conversation", (conversationId, callback) => {
+    socket.on("join-conversation", (data, callback) => {
+      const { conversationId } = data;
+
       if (!conversationId) {
         callback({ valid: false, msg: "provide a conversation Id" });
       }
@@ -27,7 +29,7 @@ export const SocketServiceInit = (server) => {
       }
       const message = await createMessage(data);
       if (message) {
-        io.to(data.conversationId).emit("receive-message", {
+        io.to(conversationId).emit("receive-message", {
           message,
           msg: "received message",
         });
