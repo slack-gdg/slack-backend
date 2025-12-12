@@ -5,7 +5,7 @@ import channelRoutes from "./channel.routes.js"
 import memberRoutes from "./member.routes.js"
 import conversationRoutes from "./conversation.routes.js"
 import workspaceRoutes from "./workspace.routes.js"
-
+import androidAuthRoutes from "./androidAuth.routes.js"
 const router=express.Router();
 
 router.use('/',oauthRoutes)
@@ -14,5 +14,6 @@ router.use('/',channelRoutes)
 router.use('/',memberRoutes)
 router.use('/',conversationRoutes)
 router.use('/',workspaceRoutes)
+router.use('/',androidAuthRoutes)
 
-export {oauthRoutes,userRoutes,memberRoutes,conversationRoutes,workspaceRoutes,channelRoutes};
+export {oauthRoutes,userRoutes,memberRoutes,conversationRoutes,workspaceRoutes,channelRoutes,androidAuthRoutes};

@@ -12,6 +12,7 @@ import {
   memberRoutes,
   conversationRoutes,
   workspaceRoutes,
+  androidAuthRoutes,
 } from "./routes/index.js";
 import logger from "./utils/logger.js";
 import { SocketServiceInit } from "./services/socket-server.js";
@@ -47,6 +48,7 @@ app.use("/channel", channelRoutes);
 app.use("/member", memberRoutes);
 app.use("/workspace", workspaceRoutes);
 app.use("/conversation", conversationRoutes);
+app.use("/androidauth", androidAuthRoutes);
 
 app.use((req, res, next) => {
   logger.info(`${req.method} ${req.url}`);

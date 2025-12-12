@@ -21,6 +21,7 @@ router.route("/register").post(validateUser, registerUser);
 router.route("/login").post(loginUser);
 router.route("/logout").post(verifyJWT, logoutUser);
 router.route("/refresh-token").post(refreshAccessToken);
+//android auth controller
 
 //~ user controller
 router.route("/").get(getAllUsers);
