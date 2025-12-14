@@ -1,1 +1,1 @@
-export const DB_NAME = "slack";
+export const DB_NAME = "cluster0";
