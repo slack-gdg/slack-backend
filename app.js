@@ -55,6 +55,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get("/health", (req, res) => {
+  res.send("Server is running...");
+});
+
 connectDB();
 
 const server = http.createServer(app);
